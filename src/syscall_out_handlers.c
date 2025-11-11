@@ -8,98 +8,98 @@
 #include <sys/user.h>
 #include "trace.h"
 
-void handle_read_write_out(pid_t pid, struct user_regs_struct *regs) {
+void handle_read_exit(pid_t pid, struct user_regs_struct *regs) {
 
 }
 
-void handle_close_out(pid_t pid, struct user_regs_struct *regs) {
+void handle_close_exit(pid_t pid, struct user_regs_struct *regs) {
 
 }
 
-void handle_openat_out(pid_t pid, struct user_regs_struct *regs) {
+void handle_openat_exit(pid_t pid, struct user_regs_struct *regs) {
  
 }
 
-void handle_lseek_out(pid_t pid, struct user_regs_struct *regs) {
+void handle_lseek_exit(pid_t pid, struct user_regs_struct *regs) {
 
 }
 
-void handle_brk_out(pid_t pid, struct user_regs_struct *regs) {
+void handle_brk_exit(pid_t pid, struct user_regs_struct *regs) {
 
 }
 
-void handle_mmap_out(pid_t pid, struct user_regs_struct *regs) {
+void handle_mmap_exit(pid_t pid, struct user_regs_struct *regs) {
 
 }
 
-void handle_munmap_out(pid_t pid, struct user_regs_struct *regs) {
+void handle_munmap_exit(pid_t pid, struct user_regs_struct *regs) {
  
 }
 
-void handle_exit_out(pid_t pid, struct user_regs_struct *regs) {
+void handle_exit_exit(pid_t pid, struct user_regs_struct *regs) {
 
 }
 
-void handle_getpid_out(pid_t pid, struct user_regs_struct *regs) {
+void handle_getpid_exit(pid_t pid, struct user_regs_struct *regs) {
 
 }
 
-void handle_fork_out(pid_t pid, struct user_regs_struct *regs) {
+void handle_fork_exit(pid_t pid, struct user_regs_struct *regs) {
 
 }
 
-void handle_clone_out(pid_t pid, struct user_regs_struct *regs) {
+void handle_clone_exit(pid_t pid, struct user_regs_struct *regs) {
     
 }
 
-void handle_execve_out(pid_t pid, struct user_regs_struct *regs) {
+void handle_execve_exit(pid_t pid, struct user_regs_struct *regs) {
     
 }
 
-void handle_stat_out(pid_t pid, struct user_regs_struct *regs) {
+void handle_stat_exit(pid_t pid, struct user_regs_struct *regs) {
     
 }
 
-void handle_fstat_out(pid_t pid, struct user_regs_struct *regs) {
+void handle_fstat_exit(pid_t pid, struct user_regs_struct *regs) {
     
 }
 
-void handle_access_out(pid_t pid, struct user_regs_struct *regs) {
+void handle_access_exit(pid_t pid, struct user_regs_struct *regs) {
     
 }
 
-void handle_getcwd_out(pid_t pid, struct user_regs_struct *regs) {
+void handle_getcwd_exit(pid_t pid, struct user_regs_struct *regs) {
     
 }
 
-void handle_chdir_out(pid_t pid, struct user_regs_struct *regs) {
+void handle_chdir_exit(pid_t pid, struct user_regs_struct *regs) {
     
 }
 
-void handle_socket_out(pid_t pid, struct user_regs_struct *regs) {
+void handle_socket_exit(pid_t pid, struct user_regs_struct *regs) {
     
 }
 
-void handle_bind_out(pid_t pid, struct user_regs_struct *regs) {
+void handle_bind_exit(pid_t pid, struct user_regs_struct *regs) {
     
 }
 
-void handle_listen_out(pid_t pid, struct user_regs_struct *regs) {
+void handle_listen_exit(pid_t pid, struct user_regs_struct *regs) {
     
 }
 
-void handle_accept_out(pid_t pid, struct user_regs_struct *regs) {
+void handle_accept_exit(pid_t pid, struct user_regs_struct *regs) {
     
 }
 
-void handle_pipe_out(pid_t pid, struct user_regs_struct *regs) {
+void handle_pipe_exit(pid_t pid, struct user_regs_struct *regs) {
     
 }
 
-void handle_dup_out(pid_t pid, struct user_regs_struct *regs) {
+void handle_dup_exit(pid_t pid, struct user_regs_struct *regs) {
     
 }
 
-void handle_dup2_out(pid_t pid, struct user_regs_struct *regs) {
+void handle_dup2_exit(pid_t pid, struct user_regs_struct *regs) {
     
 }

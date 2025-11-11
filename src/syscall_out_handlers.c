@@ -12,6 +12,10 @@ void handle_read_exit(pid_t pid, struct user_regs_struct *regs) {
 
 }
 
+void handle_write_exit(pid_t pid, struct user_regs_struct *regs) {
+
+}
+
 void handle_close_exit(pid_t pid, struct user_regs_struct *regs) {
 
 }

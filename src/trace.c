@@ -1,5 +1,4 @@
 #include "syscall_handlers.h"
-#include "syscalls_table.h"
 #include <errno.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -15,8 +14,10 @@
 void handle_syscalls_entry(pid_t child, struct user_regs_struct *regs) {
   switch (regs->orig_rax) {
   case SYS_read:
+    handle_read_entry(child, regs);
+    break;
   case SYS_write:
-    handle_read_write_entry(child, regs);
+    handle_write_entry(child, regs);
     break;
   case SYS_close:
     handle_close_entry(child, regs);
@@ -94,8 +95,10 @@ void handle_syscalls_entry(pid_t child, struct user_regs_struct *regs) {
 void handle_syscalls_exit(pid_t child, struct user_regs_struct *regs) {
   switch (regs->orig_rax) {
   case SYS_read:
+    handle_read_exit(child, regs);
+    break;
   case SYS_write:
-    handle_read_write_exit(child, regs);
+    handle_write_exit(child, regs);
     break;
   case SYS_close:
     handle_close_exit(child, regs);

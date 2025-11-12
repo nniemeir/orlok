@@ -15,7 +15,7 @@ int main(void) {
       fprintf(stderr, "TRACEME Failed: %s\n", strerror(errno));
       exit(1);
     }
-    if (execl("/bin/ls", "ls", NULL) == -1) {
+    if (execl("/bin/cat", "cat", NULL) == -1) {
       fprintf(stderr, "Failed to execute file: %s\n", strerror(errno));
       exit(1);
     }

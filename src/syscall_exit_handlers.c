@@ -18,13 +18,15 @@ void handle_read_exit(pid_t pid, struct user_regs_struct *regs,
   }
   read_string_arg(&state->read_values.buffer, pid, regs->rsi);
   state->read_values.ret_value = (long)regs->rax;
-  state->read_values.errno_value = "N/A";
-  if (state->read_values.ret_value < 0) {
-    state->read_values.errno_value = strerror(-regs->rax);
-  }
-  printf("read(%u, %s, %zu) = %ld (%s)\n", state->read_values.fd,
+
+  printf("read(%u, %s, %zu) = %ld ", state->read_values.fd,
          state->read_values.buffer, state->read_values.count,
-         state->read_values.ret_value, state->read_values.errno_value);
+         state->read_values.ret_value);
+  if (state->read_values.ret_value < 0) {
+    printf("(%s)\n", strerror(-regs->rax));
+  } else {
+    printf("\n");
+  }
   free(state->read_values.buffer);
 }
 
@@ -36,15 +38,9 @@ void handle_write_exit(pid_t pid, struct user_regs_struct *regs,
   if (state->write_values.ret_value < 0) {
     state->write_values.errno_value = strerror(-regs->rax);
   }
-  if (regs->orig_rax == SYS_read) {
-    printf("read(%u, %s, %zu) = %ld (%s)\n", state->write_values.fd,
-           state->write_values.buffer, state->write_values.count,
-           state->write_values.ret_value, state->write_values.errno_value);
-  } else {
-    printf("write(%u, %s, %zu) = %ld (%s)\n", state->write_values.fd,
-           state->write_values.buffer, state->write_values.count,
-           state->write_values.ret_value, state->write_values.errno_value);
-  }
+  printf("write(%u, %s, %zu) = %ld (%s)\n", state->write_values.fd,
+         state->write_values.buffer, state->write_values.count,
+         state->write_values.ret_value, state->write_values.errno_value);
   free(state->write_values.buffer);
 }
 

@@ -11,14 +11,12 @@
 
 #include "trace.h"
 
-#define ORIG_RAX offsetof(struct user_regs_struct, orig_rax)
-
 int main(void) {
   pid_t child;
   child = fork();
   if (child == 0) {
     ptrace(PTRACE_TRACEME, 0, NULL, NULL);
-    execl("/bin/cat", "cat", "compile_commands.json", NULL);
+    execl("/bin/ls", "ls", NULL);
   } else {
     trace_child(child);
   }

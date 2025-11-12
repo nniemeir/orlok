@@ -210,8 +210,6 @@ void handle_brk_entry(pid_t pid, struct user_regs_struct *regs);
 void handle_mmap_entry(pid_t pid, struct user_regs_struct *regs);
 void handle_munmap_entry(pid_t pid, struct user_regs_struct *regs);
 void handle_exit_entry(pid_t pid, struct user_regs_struct *regs);
-void handle_getpid_entry(pid_t pid, struct user_regs_struct *regs);
-void handle_fork_entry(pid_t pid, struct user_regs_struct *regs);
 void handle_clone_entry(pid_t pid, struct user_regs_struct *regs);
 void handle_execve_entry(pid_t pid, struct user_regs_struct *regs);
 void handle_stat_entry(pid_t pid, struct user_regs_struct *regs);
@@ -225,7 +223,6 @@ void handle_bind_entry(pid_t pid, struct user_regs_struct *regs);
 void handle_listen_entry(pid_t pid, struct user_regs_struct *regs);
 void handle_accept_entry(pid_t pid, struct user_regs_struct *regs);
 void handle_connect_entry(pid_t pid, struct user_regs_struct *regs);
-void handle_pipe_entry(pid_t pid, struct user_regs_struct *regs);
 void handle_dup_entry(pid_t pid, struct user_regs_struct *regs);
 void handle_dup2_entry(pid_t pid, struct user_regs_struct *regs);
 

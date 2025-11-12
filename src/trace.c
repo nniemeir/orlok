@@ -41,13 +41,6 @@ void handle_syscalls_entry(pid_t child, struct user_regs_struct *regs) {
   case SYS_brk:
     handle_brk_entry(child, regs);
     break;
-  case SYS_getpid:
-  case SYS_getppid:
-    handle_getpid_entry(child, regs);
-    break;
-  case SYS_fork:
-    handle_fork_entry(child, regs);
-    break;
   case SYS_execve:
     handle_execve_entry(child, regs);
     break;
@@ -79,9 +72,6 @@ void handle_syscalls_entry(pid_t child, struct user_regs_struct *regs) {
   case SYS_accept:
   case SYS_connect:
     handle_accept_entry(child, regs);
-    break;
-  case SYS_pipe:
-    handle_pipe_entry(child, regs);
     break;
   case SYS_dup:
     handle_dup_entry(child, regs);

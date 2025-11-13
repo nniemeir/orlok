@@ -19,7 +19,7 @@ void handle_read_exit(pid_t pid, struct user_regs_struct *regs,
   read_string_arg(&state->read_values.buffer, pid, regs->rsi);
   state->read_values.ret_value = (long)regs->rax;
 
-  printf("read(%u, %s, %zu) = %ld ", state->read_values.fd,
+  printf("read(%u, \"%s\", %zu) = %ld ", state->read_values.fd,
          state->read_values.buffer, state->read_values.count,
          state->read_values.ret_value);
   if (state->read_values.ret_value < 0) {
@@ -38,7 +38,7 @@ void handle_write_exit(pid_t pid, struct user_regs_struct *regs,
   if (state->write_values.ret_value < 0) {
     state->write_values.errno_value = strerror(-regs->rax);
   }
-  printf("write(%u, %s, %zu) = %ld (%s)\n", state->write_values.fd,
+  printf("write(%u, \"%s\", %zu) = %ld (%s)\n", state->write_values.fd,
          state->write_values.buffer, state->write_values.count,
          state->write_values.ret_value, state->write_values.errno_value);
   free(state->write_values.buffer);
@@ -64,7 +64,7 @@ void handle_openat_exit(pid_t pid, struct user_regs_struct *regs,
   if (state->openat_values.ret_value < 0) {
     state->openat_values.errno_value = strerror(-regs->rax);
   }
-  printf("openat(%u, %s, %d, %u) = %d (%s)\n", state->openat_values.dfd,
+  printf("openat(%u, \"%s\", %d, %u) = %d (%s)\n", state->openat_values.dfd,
          state->openat_values.filename, state->openat_values.flags,
          state->openat_values.mode, state->openat_values.ret_value,
          state->openat_values.errno_value);
@@ -180,7 +180,7 @@ void handle_execve_exit(pid_t pid, struct user_regs_struct *regs,
   if (state->execve_values.ret_value < 0) {
     state->execve_values.errno_value = strerror(-regs->rax);
   }
-  printf("execve(%s, %s, %s) = %d (%s)\n", state->execve_values.pathname,
+  printf("execve(\"%s\", %s, %s) = %d (%s)\n", state->execve_values.pathname,
          state->execve_values.argv, state->execve_values.envp,
          state->execve_values.ret_value, state->execve_values.errno_value);
   free(state->execve_values.pathname);
@@ -196,11 +196,11 @@ void handle_stat_exit(pid_t pid, struct user_regs_struct *regs,
     state->stat_values.errno_value = strerror(-regs->rax);
   }
   if (regs->orig_rax == SYS_stat) {
-    printf("stat(%s, %p) = %d (%s)\n", state->stat_values.filename,
+    printf("stat(\"%s\", %p) = %d (%s)\n", state->stat_values.filename,
            state->stat_values.statbuf, state->stat_values.ret_value,
            state->stat_values.errno_value);
   } else {
-    printf("lstat(%s, %p) = %d (%s)\n", state->stat_values.filename,
+    printf("lstat(\"%s\", %p) = %d (%s)\n", state->stat_values.filename,
            state->stat_values.statbuf, state->stat_values.ret_value,
            state->stat_values.errno_value);
   }
@@ -229,7 +229,7 @@ void handle_access_exit(pid_t pid, struct user_regs_struct *regs,
   if (state->access_values.ret_value < 0) {
     state->access_values.errno_value = strerror(-regs->rax);
   }
-  printf("access(%s, %d) = %d (%s)\n", state->access_values.pathname,
+  printf("access(\"%s\", %d) = %d (%s)\n", state->access_values.pathname,
          state->access_values.mode, state->access_values.ret_value,
          state->access_values.errno_value);
   free(state->access_values.pathname);
@@ -253,7 +253,7 @@ void handle_getcwd_exit(pid_t pid, struct user_regs_struct *regs,
   if (state->getcwd_values.ret_value == NULL) {
     state->getcwd_values.errno_value = strerror(-regs->rax);
   }
-  printf("getcwd(%s, %lu) = %s (%s)\n", state->getcwd_values.buf,
+  printf("getcwd(\"%s\", %lu) = %s (%s)\n", state->getcwd_values.buf,
          state->getcwd_values.size, state->getcwd_values.ret_value,
          state->getcwd_values.errno_value);
   free(state->getcwd_values.buf);
@@ -268,7 +268,7 @@ void handle_chdir_exit(pid_t pid, struct user_regs_struct *regs,
   if (state->chdir_values.ret_value < 0) {
     state->chdir_values.errno_value = strerror(-regs->rax);
   }
-  printf("chdir(%s) = %d, (%s)\n", state->chdir_values.path,
+  printf("chdir(\"%s\") = %d, (%s)\n", state->chdir_values.path,
          state->chdir_values.ret_value, state->chdir_values.errno_value);
   free(state->chdir_values.path);
 }

@@ -1,4 +1,5 @@
 #include <stdbool.h>
+#include <stdio.h>
 #include <sys/ptrace.h>
 #include <sys/syscall.h>
 #include <sys/wait.h>
@@ -162,29 +163,40 @@ void handle_syscalls_exit(pid_t child, struct user_regs_struct *regs,
 
 void trace_child(pid_t child) {
   int status;
-  bool entering_syscall = true;
-  syscalls_state state;
+  bool entering_syscall = false;
+  bool first_stop = true;
+  syscalls_state state = {0};
+  
   while (1) {
     ptrace(PTRACE_SYSCALL, child, NULL, NULL);
     wait(&status);
+
     if (WIFEXITED(status) || WIFSIGNALED(status)) {
       break;
     }
+
     if (status >> 8 == (SIGTRAP | (PTRACE_EVENT_EXEC << 8))) {
+      entering_syscall = !entering_syscall;
       continue;
     }
+
     struct user_regs_struct regs;
     ptrace(PTRACE_GETREGS, child, NULL, &regs);
 
+    // The tracer is first notified when execve has successfully replaced the
+    // process image, before the new program begins execution
+    if (first_stop) {
+      first_stop = false;
+      entering_syscall = !entering_syscall;
+      continue;
+    }
+
     if (entering_syscall) {
       handle_syscalls_entry(child, &regs, &state);
-      if (regs.orig_rax == SYS_execve) {
-      } else {
-        entering_syscall = !entering_syscall;
-      }
     } else {
       handle_syscalls_exit(child, &regs, &state);
-      entering_syscall = !entering_syscall;
     }
+    
+    entering_syscall = !entering_syscall;
   }
 }

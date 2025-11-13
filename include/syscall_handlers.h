@@ -20,7 +20,6 @@ void handle_clone_entry(pid_t pid, struct user_regs_struct *regs, syscalls_state
 void handle_execve_entry(pid_t pid, struct user_regs_struct *regs, syscalls_state *state);
 void handle_stat_entry(pid_t pid, struct user_regs_struct *regs, syscalls_state *state);
 void handle_fstat_entry(pid_t pid, struct user_regs_struct *regs, syscalls_state *state);
-void handle_lstat_entry(pid_t pid, struct user_regs_struct *regs, syscalls_state *state);
 void handle_access_entry(pid_t pid, struct user_regs_struct *regs, syscalls_state *state);
 void handle_getcwd_entry(pid_t pid, struct user_regs_struct *regs, syscalls_state *state);
 void handle_chdir_entry(pid_t pid, struct user_regs_struct *regs, syscalls_state *state);
@@ -47,7 +46,6 @@ void handle_clone_exit(pid_t pid, struct user_regs_struct *regs, syscalls_state 
 void handle_execve_exit(pid_t pid, struct user_regs_struct *regs, syscalls_state *state);
 void handle_stat_exit(pid_t pid, struct user_regs_struct *regs, syscalls_state *state);
 void handle_fstat_exit(pid_t pid, struct user_regs_struct *regs, syscalls_state *state);
-void handle_lstat_exit(pid_t pid, struct user_regs_struct *regs, syscalls_state *state);
 void handle_access_exit(pid_t pid, struct user_regs_struct *regs, syscalls_state *state);
 void handle_getcwd_exit(pid_t pid, struct user_regs_struct *regs, syscalls_state *state);
 void handle_chdir_exit(pid_t pid, struct user_regs_struct *regs, syscalls_state *state);

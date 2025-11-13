@@ -17,7 +17,6 @@ void handle_read_entry(pid_t pid, struct user_regs_struct *regs,
   state->read_values.count = (size_t)regs->rdx;
 }
 
-// Uses syscalls_read_values because the variables are the same
 void handle_write_entry(pid_t pid, struct user_regs_struct *regs,
                         syscalls_state *state) {
   state->write_values.fd = (unsigned int)regs->rdi;
@@ -114,7 +113,6 @@ void handle_execve_entry(pid_t pid, struct user_regs_struct *regs,
     exit(1);
   }
   read_string_arg(&state->execve_values.pathname, pid, regs->rdi);
-  state->execve_values.pathname = " ";
   char **argv_arr = NULL;
   read_string_array(&argv_arr, pid, regs->rsi);
   state->execve_values.argv = malloc(ARG_MAX);

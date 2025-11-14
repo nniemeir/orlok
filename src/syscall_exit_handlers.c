@@ -153,6 +153,8 @@ void handle_execve_exit(pid_t pid, struct user_regs_struct *regs,
          state->execve_values.ret_value);
   print_errno(regs->rax);
   free(state->execve_values.pathname);
+  free(state->execve_values.argv);
+  free(state->execve_values.envp);
 }
 
 void handle_stat_exit(pid_t pid, struct user_regs_struct *regs,

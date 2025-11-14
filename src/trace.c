@@ -8,7 +8,7 @@
 #include "syscall_types.h"
 
 static void handle_syscalls_entry(pid_t child, struct user_regs_struct *regs,
-                           syscalls_state *state) {
+                                  syscalls_state *state) {
   switch (regs->orig_rax) {
   case SYS_read:
     handle_read_entry(child, regs, state);
@@ -80,7 +80,7 @@ static void handle_syscalls_entry(pid_t child, struct user_regs_struct *regs,
 }
 
 static void handle_syscalls_exit(pid_t child, struct user_regs_struct *regs,
-                          syscalls_state *state) {
+                                 syscalls_state *state) {
   switch (regs->orig_rax) {
   case SYS_read:
     handle_read_exit(child, regs, state);
@@ -166,7 +166,7 @@ void trace_child(pid_t child, int isAttached) {
   bool entering_syscall = false;
   bool first_stop = true;
   syscalls_state state = {0};
-  
+
   while (1) {
     ptrace(PTRACE_SYSCALL, child, NULL, NULL);
     wait(&status);
@@ -196,7 +196,7 @@ void trace_child(pid_t child, int isAttached) {
     } else {
       handle_syscalls_exit(child, &regs, &state);
     }
-    
+
     entering_syscall = !entering_syscall;
   }
 }

@@ -137,10 +137,10 @@ void handle_clone_exit(pid_t pid, struct user_regs_struct *regs,
                        syscalls_state *state) {
   (void)pid;
   state->clone_values.ret_value = (long)regs->rax;
-  printf("clone(%lu, %p, %d, %d, %lu) = %ld (%s)\n", state->clone_values.flags,
+  printf("clone(%lu, %p, %d, %d, %lu) = %ld ", state->clone_values.flags,
          state->clone_values.stack, state->clone_values.parent_tid,
          state->clone_values.child_tid, state->clone_values.tls,
-         state->clone_values.ret_value, state->clone_values.errno_value);
+         state->clone_values.ret_value);
   print_errno(regs->rax);
 }
 

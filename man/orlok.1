@@ -1,16 +1,19 @@
 .TH ORLOK "1" "November 2025" "Jacob Niemeir" "User Commands"
 .SH NAME
-Orlok \- a process tracer
+Orlok \- A basic strace-like process tracing utility for x86_64 systems, created for educational purposes.
 .SH SYNOPSIS
-.B orlok [-p \fI\,PID\/\fR]
+.B orlok [-n \fI\,PATH\/\fR] | [-p \fI\,PID\/\fR]
 
 .SH DESCRIPTION
 .TP
 \fB\-h\fR 
-display program usage
+Display program usage
+.TP
+\fB\-n\fR 
+Specify path of executable to run
 .TP
 \fB\-p[PID]\fR 
-process ID of the process to hook
+Specify PID of the process to hook
 
 .SH COPYRIGHT
 Copyright \(co 2025 Jacob Niemeir.

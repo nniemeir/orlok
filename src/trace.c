@@ -7,7 +7,7 @@
 #include "syscall_handlers.h"
 #include "syscall_types.h"
 
-void handle_syscalls_entry(pid_t child, struct user_regs_struct *regs,
+static void handle_syscalls_entry(pid_t child, struct user_regs_struct *regs,
                            syscalls_state *state) {
   switch (regs->orig_rax) {
   case SYS_read:
@@ -79,7 +79,7 @@ void handle_syscalls_entry(pid_t child, struct user_regs_struct *regs,
   }
 }
 
-void handle_syscalls_exit(pid_t child, struct user_regs_struct *regs,
+static void handle_syscalls_exit(pid_t child, struct user_regs_struct *regs,
                           syscalls_state *state) {
   switch (regs->orig_rax) {
   case SYS_read:
@@ -161,7 +161,7 @@ void handle_syscalls_exit(pid_t child, struct user_regs_struct *regs,
   }
 }
 
-void trace_child(pid_t child) {
+void trace_child(pid_t child, int isAttached) {
   int status;
   bool entering_syscall = false;
   bool first_stop = true;
@@ -185,7 +185,7 @@ void trace_child(pid_t child) {
 
     // The tracer is first notified when execve has successfully replaced the
     // process image, before the new program begins execution
-    if (first_stop) {
+    if (first_stop && !isAttached) {
       first_stop = false;
       entering_syscall = !entering_syscall;
       continue;

@@ -1,3 +1,32 @@
+/*
+ * trace.c
+ *
+ * Core tracing loop for monitoring system calls made by the traced process.
+ *
+ * OVERVIEW:
+ * This file implements the main tracing logic used by Linux's ptrace per stop.
+ * Ptrace allows the parent process to observe and control execution of the
+ * child process.
+ *
+ * KEY CONCEPTS:
+ * - ptrace stops the traced process twice per syscall when run with the
+ * PTRACE_SYSCALL option
+ *
+ * - At entry, we capture arguments from parameters that will not be modified
+ * when the syscall is run
+ *
+ * - At exit, we capture the return value and any parameters that the syscall
+ * modified
+ *
+ * REGISTER USAGE (x86_64 calling convention):
+ * - rax: syscall number (orig_rax) and return value
+ * - rdi: 1st argument
+ * - rsi: 2nd argument
+ * - rdx: 3rd argument
+ * - r10: 4th argument
+ * - r8:  5th argument
+ * - r9:  6th argument
+ */
 #include <errno.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -9,6 +38,27 @@
 #include "syscall_handlers.h"
 #include "syscall_types.h"
 
+/**
+ * handle_syscalls_entry - Process syscall at entry point
+ * @child: PID of the traced process
+ * @regs: CPU register state at syscall entry
+ * @state: Stores captured register values in the types
+ * specified by the call's manual
+ *
+ * Called when the traced process enters a system call, before the kernel
+ * has executed it. At this point, registers contain the original arguments
+ * passed by the program. Some syscalls (like read) have a buffer parameter that
+ * only contains useful data at exit, so the handling logic for a syscall can
+ * differ vastly based on it's implementation.
+ *
+ * We capture arguments here because:
+ * 1. Register values may be overwritten during syscall execution
+ * 2. Pointers in registers may become invalid after the syscall
+ * 3. We need the "before" state to pair with the "after" state at exit
+ *
+ * Note: Not all syscalls have entry handlers (e.g., fork and getpid take no
+ * parameters)
+ */
 static void handle_syscalls_entry(pid_t child, struct user_regs_struct *regs,
                                   syscalls_state *state) {
   switch (regs->orig_rax) {
@@ -90,6 +140,24 @@ static void handle_syscalls_entry(pid_t child, struct user_regs_struct *regs,
     break;
   }
 }
+
+/**
+ * handle_syscalls_exit - Process syscall at exit point
+ * @child: PID of the traced process
+ * @regs: CPU register state at syscall exit
+ * @state: Stores captured register values in the types
+ * specified by the call's manual
+ *
+ * Called when the traced process exits a system call, after the kernel
+ * has executed it. At this point, we parse the register values for what the
+ * syscall returned and the parameters that it modified. Once all values have
+ * been parsed, we print the data we've gathered in the following format:
+ *
+ * CALL_NAME(arg1, arg2, arg3) = ret_value
+ *
+ * If the syscall returns a negative value, indicating error, the string
+ * corresponding to errno is appended to the output before a newline.
+ */
 static void handle_syscalls_exit(pid_t child, struct user_regs_struct *regs,
                                  syscalls_state *state) {
   switch (regs->orig_rax) {
@@ -182,7 +250,21 @@ static void handle_syscalls_exit(pid_t child, struct user_regs_struct *regs,
   }
 }
 
-void trace_child(pid_t child, int isAttached) {
+/**
+ * trace_child - Main tracing loop
+ * @child: PID of the traced process
+ * @isAttached: true if attached to existing process, false if we started a new
+ * one
+ *
+ * Say what it do
+ *
+ * PTRACE_SYSCALL stops twice per syscall:
+ * - Once when entering (before kernel executes it)
+ * - Once when exiting (after kernel executes it)
+ * 
+ * entering_syscall keeps track of which stop we are at during a given iteration
+ */
+void trace_child(pid_t child, bool isAttached) {
   int status;
   bool entering_syscall = false;
   bool first_stop = true;

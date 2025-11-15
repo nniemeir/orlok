@@ -1,4 +1,5 @@
 #include <errno.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -9,7 +10,7 @@
 #include "trace.h"
 
 static void process_args(int argc, char *argv[], char **program_path,
-                         int *isAttached, pid_t *child) {
+                         bool *isAttached, pid_t *child) {
   int c;
   optind = 1;
   while ((c = getopt(argc, argv, "hn:p:")) != -1) {
@@ -31,7 +32,7 @@ static void process_args(int argc, char *argv[], char **program_path,
 
     case 'p':
       *child = atoi(optarg);
-      *isAttached = 1;
+      *isAttached = true;
       break;
 
     case '?':
@@ -45,7 +46,7 @@ static void process_args(int argc, char *argv[], char **program_path,
 int main(int argc, char *argv[]) {
   pid_t child;
   char *program_path = NULL;
-  int isAttached = 0;
+  bool isAttached = false;
 
   process_args(argc, argv, &program_path, &isAttached, &child);
 

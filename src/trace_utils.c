@@ -19,6 +19,7 @@ void read_string_arg(char **buffer, pid_t pid, unsigned long addr) {
       fprintf(stderr, "PTRACE_PEEKDATA Failed: %s\n", strerror(errno));
       break;
     }
+
     memcpy(*buffer + i, &word, sizeof(word));
     if (memchr(&word, 0, sizeof(word)))
       break;
@@ -40,6 +41,7 @@ void read_string_array(char ***buffer, pid_t pid, unsigned long addr) {
       fprintf(stderr, "PTRACE_PEEKDATA Failed: %s\n", strerror(errno));
       break;
     }
+
     count++;
     ptr_addr += sizeof(long);
 
@@ -52,9 +54,6 @@ void read_string_array(char ***buffer, pid_t pid, unsigned long addr) {
   if (!result) {
     fprintf(stderr, "Failed to allocate memory: %s\n", strerror(errno));
     exit(1);
-  }
-  if (!result) {
-    return;
   }
 
   ptr_addr = addr;

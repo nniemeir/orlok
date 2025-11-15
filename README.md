@@ -22,15 +22,13 @@ make install
 - `make fclean` - Remove build objects and binary
 
 ### Supported Syscalls
-**File I/O:** read, write, openat, close, lseek, stat, lstat, fstat, access, getcwd, chdir, brk
+**File Descriptors:** dup, dup2, getpid, getppid
 
-**Process:** execve, exit, exit_group
+**File I/O:** access, chdir, close, fstat, getcwd, lseek, lstat, openat, pipe, read, stat, write
 
-**Memory:** mmap munmap
+**Networking:** accept, bind, connect, listen, socket 
 
-**Networking:** socket, bind, listen, accept, connect
-
-**File Descriptors:** dup, dup2
+**Processes:** brk, clone, execve, exit, exit_group, fork, mmap, munmap
 
 ## Usage
 ```

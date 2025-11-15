@@ -19,6 +19,7 @@ static void process_args(int argc, char *argv[], char **program_path,
       printf("-n[PATH]\tSpecify path of executable to run\n");
       printf("-p[PID]\tSpecify process ID to hook\n");
       exit(EXIT_FAILURE);
+
     case 'n':
       *program_path = strdup(optarg);
       if (!*program_path) {
@@ -27,10 +28,12 @@ static void process_args(int argc, char *argv[], char **program_path,
         exit(EXIT_FAILURE);
       }
       break;
+
     case 'p':
       *child = atoi(optarg);
       *isAttached = 1;
       break;
+
     case '?':
       fprintf(stderr, "Unknown option '-%c'. Run with -h for options.\n",
               optopt);
@@ -43,7 +46,9 @@ int main(int argc, char *argv[]) {
   pid_t child;
   char *program_path = NULL;
   int isAttached = 0;
+
   process_args(argc, argv, &program_path, &isAttached, &child);
+
   if (isAttached) {
     if (ptrace(PTRACE_ATTACH, child, NULL, NULL) == -1) {
       fprintf(stderr, "ATTACH Failed: %s\n", strerror(errno));
@@ -55,31 +60,37 @@ int main(int argc, char *argv[]) {
       fprintf(stderr, "Must specify program path\n");
       exit(EXIT_FAILURE);
     }
+
     child = fork();
+
     if (child == 0) {
       if (ptrace(PTRACE_TRACEME, 0, NULL, NULL) == -1) {
         fprintf(stderr, "TRACEME Failed: %s\n", strerror(errno));
         free(program_path);
         exit(EXIT_FAILURE);
       }
-      // TODO: Save everything after -n before next - to arg array
+
       if (execl(program_path, program_path, NULL) == -1) {
         fprintf(stderr, "Failed to execute file: %s\n", strerror(errno));
         free(program_path);
         exit(EXIT_FAILURE);
       }
+
       free(program_path);
     } else if (child == -1) {
       fprintf(stderr, "Failed to fork process: %s\n", strerror(errno));
       exit(EXIT_FAILURE);
     }
   }
+
   trace_child(child, isAttached);
+
   if (isAttached) {
     if (ptrace(PTRACE_DETACH, child, NULL, NULL) == -1) {
       fprintf(stderr, "DETACH Failed: %s\n", strerror(errno));
       exit(EXIT_FAILURE);
     }
   }
+
   exit(0);
 }

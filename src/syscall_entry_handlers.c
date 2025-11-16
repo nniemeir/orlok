@@ -1,3 +1,16 @@
+/**
+ * syscall_entry_handlers.c
+ *
+ * System call entry point handlers.
+ *
+ * OVERVIEW:
+ * These functions are called when a traced process ENTERS a system call,
+ * before the kernel has executed it.
+ *
+ * These functions are solely responsible for reading any input parameters used
+ * by the syscall.
+ */
+
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -11,6 +24,11 @@
 // -------------------- FILE DESCRIPTORS --------------------
 void handle_dup_entry(pid_t pid, struct user_regs_struct *regs,
                       syscalls_state *state) {
+  /*
+   * All handlers take the same parameters for the sake of simplicity, casting
+   * an unused parameter to void prevents the compiler from complaining about
+   * it.
+   */
   (void)pid;
   state->dup_values.oldfd = (int)regs->rdi;
 }
@@ -109,9 +127,6 @@ void handle_write_entry(pid_t pid, struct user_regs_struct *regs,
 void handle_read_entry(pid_t pid, struct user_regs_struct *regs,
                        syscalls_state *state) {
   (void)pid;
-  // The members of user_regs_struct are unsigned long long (64 bit uints)
-  // As such, casting to the actual type that was passed in is essential for
-  // parsing
   state->read_write_values.fd = (unsigned int)regs->rdi;
   state->read_write_values.count = (size_t)regs->rdx;
 }
@@ -160,6 +175,15 @@ void handle_clone_entry(pid_t pid, struct user_regs_struct *regs,
   state->clone_values.flags = (unsigned long)regs->rdi;
   state->clone_values.stack = (void *)regs->rsi;
 
+  /*
+   * PEEKDATA allows us to read memory from another process and we use it here
+   * to read the data that a pointer is referencing.
+   *
+   * Checking for errors with PEEKDATA is kind of wacky, as it sets errno on
+   * error but does not indicate error through its return value (-1 can be
+   * returned on success). We handle this by setting errno to 0 and checking if
+   * it changes after PEEKDATA runs.
+   */
   errno = 0;
   state->clone_values.parent_tid =
       (int)ptrace(PTRACE_PEEKDATA, pid, regs->rdx, NULL);

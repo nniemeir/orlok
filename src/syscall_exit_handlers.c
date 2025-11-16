@@ -1,3 +1,40 @@
+/**
+ * syscall_exit_handlers.c
+ *
+ * System call exit point handlers.
+ *
+ * OVERVIEW:
+ * These functions are called when a traced process EXITS a system call,
+ * after the kernel has executed it. At this point, output parameters have
+ * been filled and the rax register contains the return value (or error code).
+ *
+ * RESPONSIBILITIES:
+ * 1. Read any output parameters
+ * 2. Read the return value from rax
+ * 3. Print the syscall in the format: syscall(arg1, arg2) = result
+ * (errno_string)
+ * 4. Free any memory allocated by the handlers
+ *
+ * RETURN VALUE:
+ * System calls use a special error convention:
+ * - Success: Return value is >= 0 (positive or zero)
+ * - Error: Return value is negative errno
+ *
+ * This confused me at first, because the glibc wrappers for the syscalls (what
+ * the manuals are referencing) handle returning on error differently:
+ * - Success: Return actual value
+ * - Error: Return -1 and set global errno variable
+ *
+ * EXAMPLE:
+ *   Raw syscall: open() returns -2 (meaning ENOENT - file not found)
+ *   Library wrapper: open() returns -1, errno is set to 2
+ *
+ * OUTPUT FORMAT:
+ * We aim to match strace's output format:
+ *   syscall_name(arg1, arg2, ...) = return_value
+ *   syscall_name(arg1, arg2, ...) = -1 ERRNO (Error string)
+ */
+
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -9,10 +46,26 @@
 #include "syscall_types.h"
 #include "trace.h"
 
-// Raw syscalls return -errno on error (e.g. -2 for ENOENT)
-// Their glibc wrappers return -1 on error and set errno
+/**
+ * print_errno - Print error string if syscall failed
+ * @rax: Return value from syscall (in rax register)
+ *
+ * Checks if the return value indicates an error (negative) and prints
+ * the corresponding error string.
+ *
+ * WHY NEGATIVE VALUES MEAN ERRORS:
+ * The kernel returns -errno on error. For example:
+ * - File not found: return -ENOENT (which is -2)
+ * - Permission denied: return -EACCES (which is -13)
+ *
+ * EXAMPLE:
+ *   rax = -2 (ENOENT)
+ *   Output: (No such file or directory)
+ */
 static void print_errno(unsigned long long rax) {
+  // Cast to signed long so that the sign is properly interpreted
   if ((long)rax < 0) {
+    // strerror returns the string that matches the value of errno
     printf("(%s)\n", strerror(-(int)rax));
   } else {
     printf("\n");
@@ -22,6 +75,11 @@ static void print_errno(unsigned long long rax) {
 // -------------------- FILE DESCRIPTORS --------------------
 void handle_dup_exit(pid_t pid, struct user_regs_struct *regs,
                      syscalls_state *state) {
+  /*
+   * All handlers take the same parameters for the sake of simplicity, casting
+   * an unused parameter to void prevents the compiler from complaining about
+   * it.
+   */
   (void)pid;
   state->dup_values.ret_value = (int)regs->rax;
   printf("dup(%d) = %d ", state->dup_values.oldfd, state->dup_values.ret_value);
@@ -90,6 +148,9 @@ void handle_fstat_exit(pid_t pid, struct user_regs_struct *regs,
   print_errno(regs->rax);
 }
 
+/*
+ * The buffer has been filled by the kernel and is ready to be read.
+ */
 void handle_getcwd_exit(pid_t pid, struct user_regs_struct *regs,
                         syscalls_state *state) {
   state->getcwd_values.buf = malloc(ARG_MAX);
@@ -157,8 +218,21 @@ void handle_openat_exit(pid_t pid, struct user_regs_struct *regs,
   free(state->openat_values.filename);
 }
 
+/*
+ * The kernel has filled the 2-element file descriptor array at this point, so
+ * it can be read.
+ */
 void handle_pipe_exit(pid_t pid, struct user_regs_struct *regs,
                       syscalls_state *state) {
+  /*
+   * PEEKDATA allows us to read memory from another process and we use it here
+   * to read the data that a pointer is referencing.
+   *
+   * Checking for errors with PEEKDATA is kind of wacky, as it sets errno on
+   * error but does not indicate error through its return value (-1 can be
+   * returned on success). We handle this by setting errno to 0 and checking if
+   * it changes after PEEKDATA runs.
+   */
   errno = 0;
   state->pipe_values.pipefd[0] =
       (int)ptrace(PTRACE_PEEKDATA, pid, regs->rdi, NULL);
@@ -179,6 +253,9 @@ void handle_pipe_exit(pid_t pid, struct user_regs_struct *regs,
   print_errno(regs->rax);
 }
 
+/**
+ * The buffer has been filled by the kernel and is ready to be read.
+ */
 void handle_read_exit(pid_t pid, struct user_regs_struct *regs,
                       syscalls_state *state) {
   state->read_write_values.buffer = malloc(ARG_MAX);
@@ -197,6 +274,10 @@ void handle_read_exit(pid_t pid, struct user_regs_struct *regs,
   free(state->read_write_values.buffer);
 }
 
+/*
+ * In this case, the buffer is already filled at entry so it does not need to be
+ * read.
+ */
 void handle_write_exit(pid_t pid, struct user_regs_struct *regs,
                        syscalls_state *state) {
   (void)pid;

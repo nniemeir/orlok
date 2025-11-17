@@ -1,5 +1,5 @@
 # Orlok
-A basic strace-like process tracing utility for x86_64 systems, created for educational purpose.
+A basic strace-like process tracing utility for x86_64 systems, created for educational purposes.
 
 ## Dependencies
 * GCC

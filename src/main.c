@@ -118,7 +118,7 @@ static void process_args(int argc, char *argv[], char **program_path,
  * 3. Call trace_child() to perform the actual tracing
  * 4. Perform any necessary cleanup and exit
  *
- * Return: 0 on success, exits with error otherwise
+ * Return: EXIT_SUCCESS on success, EXIT_FAILURE on failure
  */
 int main(int argc, char *argv[]) {
   pid_t child;               // PID of the process to trace

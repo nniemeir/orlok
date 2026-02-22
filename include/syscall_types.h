@@ -82,7 +82,7 @@ typedef struct {
 } syscall_openat_values;
 
 typedef struct {
-  int *pipefd;
+  int pipefd[2];
   int ret_value;
 } syscall_pipe_values;
 
